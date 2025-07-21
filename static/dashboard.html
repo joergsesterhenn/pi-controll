@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chicken Pi Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        button {
+            display: block;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.2rem;
+            width: 300px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        pre {
+            background: #eee;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+
+</head>
+
+<body>
+    <h1>🐔 Raspberry Pi Control Panel</h1>
+    <button onclick="callAPI('/capture', 'POST')">📸 Capture Image</button>
+    <button onclick="callAPI('/door', 'POST')">🚪 Cycle Coop Door</button>
+    <button onclick="callAPI('/lights', 'POST')">💡 Toggle Lights</button>
+    <button onclick="callAPI('/temperature', 'GET')">🌡️ Read Temperature</button>
+    <h2>Response:</h2>
+    <pre id="output">Waiting...</pre>
+    <h2>Latest Image:</h2>
+    <img id="latestImage" src="" alt="No image found"
+        style="max-width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 8px;">
+
+    <script>
+        async function callAPI(endpoint, method) {
+            const res = await fetch(endpoint, { method: method });
+            const data = await res.json();
+            document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            if (endpoint === "/capture") {
+                // Refresh latest image after capture
+                await updateLatestImage();
+            }
+        }
+        async function updateLatestImage() {
+            const res = await fetch('/latest-image');
+            const data = await res.json();
+            if (data.url) {
+                document.getElementById("latestImage").src = data.url + "?t=" + new Date().getTime();  // cache busting
+            } else {
+                document.getElementById("latestImage").alt = "No image found";
+            }
+        }
+        // Call once on page load
+        updateLatestImage();
+    </script>
+</body>
+
+</html>

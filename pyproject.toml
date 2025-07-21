@@ -5,7 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "fastapi>=0.116.1",
     "gpiozero>=2.0.1",
     "rich>=14.0.0",
     "rpi-gpio>=0.7.1",
+    "uvicorn>=0.35.0",
 ]
