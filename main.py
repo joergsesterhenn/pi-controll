@@ -6,9 +6,9 @@ logger=logging.getLogger(__name__)
 def main():
     logger.debug("Hello from chickenpi!")
     #capture_image() #ok
-    #coop_door()     #ok needs sudo
+    coop_door()     #ok
     #lights()        #ok
-    temp()           #ok
+    #temp()           #ok
 
 if __name__ == "__main__":
     main()
