@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+chickenpi.egg-info/PKG-INFO
+chickenpi.egg-info/SOURCES.txt
+chickenpi.egg-info/dependency_links.txt
+chickenpi.egg-info/requires.txt
+chickenpi.egg-info/top_level.txt
