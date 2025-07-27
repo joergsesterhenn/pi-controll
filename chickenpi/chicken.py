@@ -9,20 +9,43 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from gpiozero import Motor, OutputDevice
 from rich.pretty import pprint
 
+from chickenpi.lights import toggle, state
+from chickenpi.door import open_door, close_door
 from chickenpi.DS18B20 import DS18B20
+import sys
 
 app = FastAPI()
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# StreamHandler für die Konsole
+stream_handler = logging.StreamHandler(sys.stdout)
+log_formatter = logging.Formatter("%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s")
+stream_handler.setFormatter(log_formatter)
+logger.addHandler(stream_handler)
+
 
 app.mount("/captures", StaticFiles(directory="."), name="captures")
 app.mount("/static", StaticFiles(directory="static", follow_symlink=True), name="static")
 app.mount("/assets", StaticFiles(directory="assets", follow_symlink=True), name="assets")
 
-relay1 = OutputDevice(18, active_high=False, initial_value=None)
+@app.post("/door")
+def coop_door(direction:str):
+    if direction=="up":
+        open_door()
+    if direction=="down":
+        close_door()
+
+@app.post("/lights")
+def lights():
+    return toggle()
+
+@app.get("/light-state")
+def light_state():
+    return state()
 
 @app.post("/capture")
 def capture_image():
@@ -32,36 +55,6 @@ def capture_image():
     filename = f"{foldername}/{timestamp}_capture.jpg"
     subprocess.run(["fswebcam", "-r", "1280x960", filename])
     return {"status": "image captured", "filename": filename}
-
-
-@app.post("/door")
-def coop_door(direction:str):
-    logger.info("direction: %s",direction)
-    if direction=="up":
-      motor = Motor(forward=17, backward=22, enable=23)
-      motor.forward()
-      sleep(2)
-      motor.stop()
-    elif direction=="down":
-      motor = Motor(forward=17, backward=22, enable=23)
-      motor.backward()
-      sleep(2)
-      motor.stop()
-    return {"status": f"door went {direction}"}
-
-
-@app.post("/lights")
-def lights():
-    #    relay1 = OutputDevice(18, active_high=False, initial_value=None)
-    state_before = relay1.value
-    relay1.toggle()
-    state_after = relay1.value
-    return {
-        "status": "relay toggled",
-        "initial_state": state_before,
-        "final_state": state_after,
-    }
-
 
 @app.get("/temperature")
 def read_temperature():
@@ -84,7 +77,6 @@ def read_temperature():
                 readings[label] = round(temp, 1)
             except Exception as e:
                 readings[label] = f"error: {e}"
-
     return readings
 
 
@@ -92,9 +84,7 @@ def read_temperature():
 def dashboard():
     logger.info("dashboard opened")
     with open("static/index.html", "r", encoding="utf-8") as f:
-        html = f.read()
-        return html
-
+        return f.read()
 
 @app.get("/latest-image")
 def latest_image():
@@ -106,10 +96,3 @@ def latest_image():
     image_files.sort(key=os.path.getmtime)
     latest = image_files[-1]
     return FileResponse(latest, media_type="image/jpeg")
-
-
-@app.get("/light-state")
-def light_state():
-    #    relay1 = OutputDevice(18, active_high=False, initial_value=None)
-    return {"on": relay1.value == 1}
-
