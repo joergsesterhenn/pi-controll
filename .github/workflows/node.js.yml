@@ -34,7 +34,8 @@ jobs:
       uses: astral-sh/setup-uv@v6.4.3
       with:
         cache-dependency-glob: "**/uv.lock"
-
+    - name: create venv
+      run: uv venv
     - name: build backend
       run: uv pip install .
 
