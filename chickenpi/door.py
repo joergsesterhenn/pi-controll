@@ -46,10 +46,22 @@ def open_door():
         door_state = Doorstate.OPENING
         logger.info("opening door")
         motor.forward()
-        upper_stop_sensor.wait_for_active(5)
+        upper_stop_sensor.wait_for_active(10)
         motor.stop()
         door_state = Doorstate.OPEN
         return {"status": "door open"}
+
+
+def coop_door_state():
+    with door_lock:
+        if door_state != Doorstate.UNDEFINED:
+            if upper_stop_sensor.value:
+                return {"status": Doorstate.OPEN.value}
+            if lower_stop_sensor.value:
+                return {"status": Doorstate.CLOSED.value}
+        else:
+            return {"status": door_state.value}
+
 
 
 def close_door():
@@ -63,10 +75,10 @@ def close_door():
             logger.info("door is already closed")
             return {"status": "door closed"}
 
-        door_state = Doorstate.OPENING
-        logger.info("opening door")
+        door_state = Doorstate.CLOSING
+        logger.info("closing door")
         motor.backward()
-        lower_stop_sensor.wait_for_active(5)
+        lower_stop_sensor.wait_for_active(10)
         motor.stop()
         door_state = Doorstate.CLOSED
         return {"status": "door closed"}

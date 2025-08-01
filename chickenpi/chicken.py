@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from rich.pretty import pprint
 
 from chickenpi.lights import toggle, state
-from chickenpi.door import open_door, close_door
+from chickenpi.door import open_door, close_door, coop_door_state
 from chickenpi.DS18B20 import DS18B20
 import sys
 
@@ -38,6 +38,10 @@ def coop_door(direction:str):
         open_door()
     if direction=="down":
         close_door()
+
+@app.get("/door-state")
+def door_state():
+    return coop_door_state()
 
 @app.post("/lights")
 def lights():
