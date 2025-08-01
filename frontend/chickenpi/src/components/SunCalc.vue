@@ -1,18 +1,18 @@
 <template>
-  <v-card class="pa-4 mt-4"  title="☀️ Sunrise & Sunset">
+  <v-card class="pa-4 mt-4"  title="☀️ Tageslicht">
     <v-card-text>
       <div v-if="error" class="text-red">{{ error }}</div>
-      <div v-else-if="loading" class="text-grey">Loading sun data...</div>
+      <div v-else-if="loading" class="text-grey">Lade Sonnen Daten...</div>
       <div v-else>
         <v-row justify="space-around" class="mb-4">
           <v-col cols="5" class="text-center">
             <div class="text-yellow-darken-2 text-h4">🌅</div>
-            <div class="text-caption">Sunrise</div>
+            <div class="text-caption">Sonnen-Aufgang</div>
             <div class="font-weight-medium">{{ formatTime(sunrise) }}</div>
           </v-col>
           <v-col cols="5" class="text-center">
             <div class="text-orange-darken-2 text-h4">🌇</div>
-            <div class="text-caption">Sunset</div>
+            <div class="text-caption">Sonnen-Untergang</div>
             <div class="font-weight-medium">{{ formatTime(sunset) }}</div>
           </v-col>
         </v-row>
@@ -24,7 +24,7 @@
           rounded
         ></v-progress-linear>
         <div class="text-caption text-center mt-2">
-          Daylight: {{ daylightProgress.toFixed(1) }}%
+          Tageslicht: {{ daylightProgress.toFixed(1) }}%
         </div>
       </div>
     </v-card-text>
@@ -59,10 +59,10 @@ onMounted(() => {
     const total = sunset.value.getTime() - sunrise.value.getTime()
     const elapsed = Math.min(Math.max(now.getTime() - sunrise.value.getTime(), 0), total)
 
-    daylightProgress.value = (elapsed / total) * 100
+    daylightProgress.value = 100 - (elapsed / total) * 100
     loading.value = false
   } catch (e) {
-    error.value = 'Error calculating sun times.'
+    error.value = 'Fehler bei der Berechnung.'
     loading.value = false
   }
 })

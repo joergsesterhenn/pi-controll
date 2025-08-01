@@ -20,7 +20,7 @@
               :model-value="temp.outside"
               :size="120"
               :width="15"
-              color="blue"
+              color="red"
               :rotate="270"
               :max="50"
             >

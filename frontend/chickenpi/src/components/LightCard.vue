@@ -1,46 +1,48 @@
-import logging
-from gpiozero import OutputDevice, Device
-from gpiozero.pins.lgpio import LGPIOFactory
-from threading import Lock
-from lgpio import gpiochip_open, gpio_read, gpiochip_close
+<template>
+      <v-card class="pa-4 mt-4" title="💡 Licht">
+	<v-switch
+         v-if="lightOn !== undefined"
+         v-model="lightOn"
+         :label="lightOn ? 'Licht an' : 'Licht aus'"
+         inset
+         color="yellow-darken-3"
+         hide-details
+         :loading="toggling"
+         :disabled="toggling"
+         @change="toggleLight"
+        >
+          <template #thumb>
+            <v-icon>{{ lightOn ? 'mdi-lightbulb-on' : 'mdi-lightbulb-off' }}</v-icon>
+          </template>
+        </v-switch>
+      </v-card>
+</template>
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
 
-logger = logging.getLogger(__name__)
-lights_lock = Lock()
+const lightOn =  ref<boolean | undefined>(undefined)
 
-Device.pin_factory = LGPIOFactory()
+const toggling = ref(false)
 
-_relay1 = None
+async function toggleLight() {
+  toggling.value = true
+  try {
+    await fetch('/lights', { method: 'POST' })
+    await fetchLightState()
+  } catch (e) {
+    console.error('Toggle failed:', e)
+  } finally {
+    toggling.value = false
+  }
+}
 
-def get_relay():
-    global _relay1
-    if _relay1 is None:
-        h = gpiochip_open(0)
-        current = gpio_read(h, 18)
-        gpiochip_close(h)
+async function fetchLightState(){
+      const res = await fetch('/light-state')
+      const data = await res.json()
+      lightOn.value = data.on
+}
 
-        # Match current output state to prevent relay from switching
-        initial_value = True if current else False
-        logger.info(f"Initializing relay on GPIO18 with initial_value={initial_value}")
-        _relay1 = OutputDevice(18, active_high=False, initial_value=initial_value)
-    return _relay1
-
-def toggle():
-    with lights_lock:
-        relay = get_relay()
-        state_before = relay.value
-        relay.toggle()
-        state_after = relay.value
-        return {
-            "status": "relay 1 toggled",
-            "initial_state": state_before,
-            "final_state": state_after,
-        }
-
-def state():
-    with lights_lock:
-        h = gpiochip_open(0)
-        current = gpio_read(h, 18)
-        gpiochip_close(h)
-
-        # active_high=False → LOW (0) = ON
-        return {"on": current == 0}
+onMounted(async () => {
+  await fetchLightState()
+})
+</script>

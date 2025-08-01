@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <v-container>
-      <h1>🐔 Chicken Pi Controll ⚙️ </h1>
-      <DoorCard /> 
+      <h1>🐔 Chicken Pi ⚙️</h1>
+      <DoorCard />
       <LightCard />
-      <ImageCaptureCard /> 
+      <ImageCaptureCard />
       <TempCard />
       <SunCalc />
     </v-container>
