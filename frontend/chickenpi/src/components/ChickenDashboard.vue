@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-container>
-      <h1>🐔 Chicken Pi ⚙️</h1>
+      <h1 class="text-center">🐔 Chicken Pi ⚙️</h1>
       <DoorCard />
       <LightCard />
       <ImageCaptureCard />

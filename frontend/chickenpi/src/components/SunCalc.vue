@@ -1,5 +1,8 @@
 <template>
-  <v-card class="pa-4 mt-4"  title="☀️ Tageslicht">
+  <v-card class="pa-4 mt-4">
+    <template #title>
+      <div class="text-h6 text-center w-100">☀️ Tageslicht</div>
+    </template>
     <v-card-text>
       <div v-if="error" class="text-red">{{ error }}</div>
       <div v-else-if="loading" class="text-grey">Lade Sonnen Daten...</div>

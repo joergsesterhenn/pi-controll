@@ -54,11 +54,10 @@ def open_door():
 
 def coop_door_state():
     with door_lock:
-        if door_state != Doorstate.UNDEFINED:
-            if upper_stop_sensor.value:
-                return {"status": Doorstate.OPEN.value}
-            if lower_stop_sensor.value:
-                return {"status": Doorstate.CLOSED.value}
+        if upper_stop_sensor.value:
+            return {"status": Doorstate.OPEN.value}
+        if lower_stop_sensor.value:
+            return {"status": Doorstate.CLOSED.value}
         else:
             return {"status": door_state.value}
 

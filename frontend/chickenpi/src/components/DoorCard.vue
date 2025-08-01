@@ -1,13 +1,22 @@
 <template>
-  <v-card class="pa-4 mt-4" title="🚪 Hühnerklappe">
+  <v-card class="pa-4 mt-4">
+    <template #title>
+      <div class="text-h6 text-center w-100">🚪 Hühnerklappe</div>
+    </template>
     <v-row align="center" justify="center">
-      <v-btn color="green" @click="moveDoor('up')">
-        <v-icon>mdi-arrow-up-bold</v-icon>
-      </v-btn>
-      <div class="text-body-1 font-weight-medium">{{ doorStatusText }}</div>
-      <v-btn color="red" @click="moveDoor('down')">
-        <v-icon>mdi-arrow-down-bold</v-icon>
-      </v-btn>
+      <v-col>
+        <v-btn color="green" @click="moveDoor('up')">
+          <v-icon>mdi-arrow-up-bold</v-icon>
+        </v-btn>
+      </v-col>
+      <v-col>
+        <div class="text-body-1 font-weight-medium">{{ doorStatusText }}</div>
+      </v-col>
+      <v-col>
+        <v-btn color="red" @click="moveDoor('down')">
+          <v-icon>mdi-arrow-down-bold</v-icon>
+        </v-btn>
+      </v-col>
     </v-row>
   </v-card>
 </template>

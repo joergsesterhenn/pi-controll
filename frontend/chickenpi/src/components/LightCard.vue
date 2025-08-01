@@ -1,6 +1,9 @@
 <template>
-      <v-card class="pa-4 mt-4" title="💡 Licht">
-	<v-switch
+      <v-card class="pa-4 mt-4">
+        <template #title>
+          <div class="text-h6 text-center w-100">💡 Licht</div>
+        </template>
+	      <v-switch
          v-if="lightOn !== undefined"
          v-model="lightOn"
          :label="lightOn ? 'Licht an' : 'Licht aus'"
