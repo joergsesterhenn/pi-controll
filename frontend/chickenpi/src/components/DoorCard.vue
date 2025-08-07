@@ -5,7 +5,7 @@
     </template>
     <v-row align="center" justify="center">
       <v-col>
-        <v-btn color="green" @click="moveDoor('up')">
+        <v-btn color="blue" @click="moveDoor('up')" :disabled="open" class="fade-button">
           <v-icon>mdi-arrow-up-bold</v-icon>
         </v-btn>
       </v-col>
@@ -13,7 +13,7 @@
         <div class="text-body-1 font-weight-medium">{{ doorStatusText }}</div>
       </v-col>
       <v-col>
-        <v-btn color="red" @click="moveDoor('down')">
+        <v-btn color="blue" @click="moveDoor('down')" :disabled="closed" class="fade-button">
           <v-icon>mdi-arrow-down-bold</v-icon>
         </v-btn>
       </v-col>
@@ -35,6 +35,8 @@ const DoorStateLabels = [
 ]
 
 const doorStatusText = computed(() => DoorStateLabels[doorStatus.value] ?? 'Fehler')
+const closed = computed(() => doorStatus.value==2)
+const open = computed(() => doorStatus.value==1)
 
 async function fetchDoorState() {
   try {
@@ -57,3 +59,12 @@ async function moveDoor(direction: 'up' | 'down') {
   await fetch(`/door?direction=${direction}`, { method: 'POST' });
 }
 </script>
+<style scoped>
+.fade-button {
+  transition: opacity 0.3s ease;
+}
+.fade-button:disabled {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+</style>
