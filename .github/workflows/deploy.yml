@@ -68,8 +68,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "chickenpi-dist-${{ env.UNIQUE_VERSION }}.zip"
-          asset_name: "chickenpi-dist-${{ env.UNIQUE_VERSION }}.zip"
+          asset_path: "dist-${{ env.UNIQUE_VERSION }}.zip"
+          asset_name: "dist-${{ env.UNIQUE_VERSION }}.zip"
           asset_content_type: application/zip
 
   deploy:
