@@ -20,7 +20,7 @@ jobs:
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          pip install uv
+          pip install uv uvx
 
       - name: Compute unique version
         id: version
