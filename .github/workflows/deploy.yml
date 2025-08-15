@@ -1,5 +1,8 @@
 name: Deploy to Raspberry Pi
-
+permissions:
+  contents: write
+  attestations: write
+  id-token: write
 on:
   push:
     branches: ["main"]
@@ -7,6 +10,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
