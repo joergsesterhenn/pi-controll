@@ -16,16 +16,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m venv .venv
           . .venv/bin/activate
-          pip install uv uvx
+          pip install uv toml-cli
 
       - name: Compute unique version
         id: version
         run: |
-          PKG_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version)
+          PKG_VERSION=$(toml get --toml-path=pyproject.toml project.version)
           BUILD_NUMBER="${{ github.run_number }}"
           UNIQUE_VERSION="${PKG_VERSION}.${BUILD_NUMBER}"
           echo "UNIQUE_VERSION=$UNIQUE_VERSION" >> $GITHUB_ENV
@@ -34,7 +34,7 @@ jobs:
       - name: Build artifact with uv
         run: |
           . .venv/bin/activate
-          uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version ${{ env.UNIQUE_VERSION }}
+          toml set --toml-path=pyproject.toml project.version ${{ env.UNIQUE_VERSION }}
           uv build
 
       - name: Upload artifact
