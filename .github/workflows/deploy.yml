@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chickenpi-${{ env.UNIQUE_VERSION }}.zip
+          name: chickenpi-${{ env.UNIQUE_VERSION }}
           path: dist/chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
 
       - name: Create Release
