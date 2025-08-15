@@ -29,8 +29,6 @@ logger.addHandler(stream_handler)
 
 
 app.mount("/captures", StaticFiles(directory="."), name="captures")
-app.mount("/static", StaticFiles(directory="static", follow_symlink=True), name="static")
-app.mount("/assets", StaticFiles(directory="assets", follow_symlink=True), name="assets")
 
 @app.post("/door")
 def coop_door(direction:str):
@@ -83,12 +81,6 @@ def read_temperature():
                 readings[label] = f"error: {e}"
     return readings
 
-
-@app.get("/", response_class=HTMLResponse)
-def dashboard():
-    logger.info("dashboard opened")
-    with open("static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
 
 @app.get("/latest-image")
 def latest_image():
