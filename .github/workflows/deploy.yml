@@ -22,16 +22,47 @@ jobs:
           . .venv/bin/activate
           pip install uv
 
+      - name: Compute unique version
+        id: version
+        run: |
+          PKG_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version)
+          BUILD_NUMBER="${{ github.run_number }}"
+          UNIQUE_VERSION="${PKG_VERSION}.${BUILD_NUMBER}"
+          echo "UNIQUE_VERSION=$UNIQUE_VERSION" >> $GITHUB_ENV
+          echo "unique_version=$UNIQUE_VERSION" >> $GITHUB_OUTPUT
+
       - name: Build artifact with uv
         run: |
           . .venv/bin/activate
+          uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version ${{ env.UNIQUE_VERSION }}
           uv build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: dist/*.*-py3-none-any.whl
+          path: dist/chickenpi.${{ env.UNIQUE_VERSION }}-py3-none-any.whl
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "release-${{ env.UNIQUE_VERSION }}"
+          release_name: "Release ${{ env.UNIQUE_VERSION }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "dist-${{ env.UNIQUE_VERSION }}.zip"
+          asset_name: "dist-${{ env.UNIQUE_VERSION }}.zip"
+          asset_content_type: application/zip
 
   deploy:
     runs-on: ubuntu-latest
