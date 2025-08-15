@@ -25,6 +25,7 @@ jobs:
       - name: Compute unique version
         id: version
         run: |
+          . .venv/bin/activate
           PKG_VERSION=$(toml get --toml-path=pyproject.toml project.version)
           BUILD_NUMBER="${{ github.run_number }}"
           UNIQUE_VERSION="${PKG_VERSION}.${BUILD_NUMBER}"
