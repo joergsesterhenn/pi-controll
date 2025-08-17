@@ -9,6 +9,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from rich.pretty import pprint
 
 from chickenpi.lights import toggle, state
@@ -17,6 +18,21 @@ from chickenpi.DS18B20 import DS18B20
 import sys
 
 app = FastAPI()
+
+origins = [
+    "https://coop-pi.web.app",
+    "http://localhost:8000",
+    "http://localhost:5173",
+    "http://raspberrypi:8000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
