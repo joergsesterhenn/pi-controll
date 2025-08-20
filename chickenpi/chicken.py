@@ -4,8 +4,9 @@ import os
 import subprocess
 from datetime import datetime
 from time import sleep
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -16,7 +17,7 @@ from chickenpi.lights import toggle, state
 from chickenpi.door import open_door, close_door, coop_door_state
 from chickenpi.DS18B20 import DS18B20
 import sys
-
+from chickenpi.auth import verify_firebase_token
 app = FastAPI()
 
 origins = [
@@ -33,9 +34,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
-
+logging.setLevel(logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 # StreamHandler für die Konsole
 stream_handler = logging.StreamHandler(sys.stdout)
@@ -47,25 +47,25 @@ logger.addHandler(stream_handler)
 app.mount("/captures", StaticFiles(directory="."), name="captures")
 
 @app.post("/door")
-def coop_door(direction:str):
+def coop_door(direction:str, user_info: Annotated[dict, Depends(verify_firebase_token)]):
     if direction=="up":
         open_door()
     if direction=="down":
         close_door()
 
-@app.get("/door-state")
+@app.get("/door-state", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def door_state():
     return coop_door_state()
 
-@app.post("/lights")
+@app.post("/lights", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def lights():
     return toggle()
 
-@app.get("/light-state")
+@app.get("/light-state", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def light_state():
     return state()
 
-@app.post("/capture")
+@app.post("/capture", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def capture_image():
     foldername = f"captures/{datetime.now().strftime('%Y/%m/%d')}"
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -74,7 +74,7 @@ def capture_image():
     subprocess.run(["fswebcam", "-r", "1280x960", filename])
     return {"status": "image captured", "filename": filename}
 
-@app.get("/temperature")
+@app.get("/temperature", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def read_temperature():
     # Map known sensor IDs to logical names
     sensor_map = {"28-0417a142c0ff": "inside", "28-0417a12507ff": "outside"}
@@ -98,7 +98,7 @@ def read_temperature():
     return readings
 
 
-@app.get("/latest-image")
+@app.get("/latest-image", user_info: Annotated[dict, Depends(verify_firebase_token)])
 def latest_image():
     # Recursively find all *_capture.jpg files
     image_files = glob.glob("captures/20??/??/??/*_capture.jpg", recursive=True)
