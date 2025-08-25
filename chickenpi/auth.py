@@ -1,12 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Header
+from fastapi import HTTPException, status, Header
 from typing import Annotated
 import firebase_admin
 from firebase_admin import credentials, auth
 from firebase_admin.exceptions import FirebaseError
 import os
-import json
 
-SERVICE_ACCOUNT_PATH = os.environ.get("FIREBASE_SERVICE_ACCOUNT_KEY_PATH", "path/to/your-key-file.json")
+
+SERVICE_ACCOUNT_PATH = os.environ.get(
+    "FIREBASE_SERVICE_ACCOUNT_KEY_PATH", "path/to/your-key-file.json"
+)
 
 # Ensure the service account key file exists before trying to initialize.
 if not os.path.exists(SERVICE_ACCOUNT_PATH):
@@ -32,9 +34,9 @@ async def verify_firebase_token(authorization: Annotated[str, Header()]):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authorization header must be provided with 'Bearer' schema."
+            detail="Authorization header must be provided with 'Bearer' schema.",
         )
-    
+
     # Extract the token from the "Bearer <token>" string.
     id_token = authorization.split(" ")[1]
 
@@ -47,13 +49,11 @@ async def verify_firebase_token(authorization: Annotated[str, Header()]):
     except ValueError as e:
         # The token is invalid, e.g., malformed.
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token: {e}"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {e}"
         )
     except FirebaseError as e:
         # The token is expired, revoked, etc.
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token verification failed: {e}"
+            detail=f"Token verification failed: {e}",
         )
-

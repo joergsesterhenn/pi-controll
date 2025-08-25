@@ -3,16 +3,19 @@ name = "chickenpi"
 version = "0.2.0"
 description = "Backend for automating chicken coop with raspberry pi."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116.1",
+    "firebase-admin>=7.1.0",
     "gpiozero>=2.0.1",
     "rich>=14.0.0",
-    "rpi-gpio>=0.7.1",
+    "rpi-lgpio>=0.6",
     "uvicorn>=0.35.0",
 ]
 
 [dependency-groups]
 dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
     "toml-cli>=0.8.1",
 ]
