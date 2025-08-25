@@ -1,9 +1,5 @@
-import glob
 import logging
-import os
 import sys
-import subprocess
-from datetime import datetime
 from typing import Annotated
 
 from fastapi import FastAPI, Depends
@@ -14,8 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from chickenpi.images import get_latest_image, get_new_image
 from chickenpi.lights import toggle, state
 from chickenpi.door import open_door, close_door, coop_door_state
-from chickenpi.DS18B20 import DS18B20
 from chickenpi.auth import verify_firebase_token
+from chickenpi.temperature import get_readings
 
 app = FastAPI()
 
@@ -81,26 +77,7 @@ def capture_image(user_info: Annotated[dict, Depends(verify_firebase_token)]):
 
 @app.get("/temperature")
 def read_temperature(user_info: Annotated[dict, Depends(verify_firebase_token)]):
-    # Map known sensor IDs to logical names
-    sensor_map = {"28-0417a142c0ff": "inside", "28-0417a12507ff": "outside"}
-
-    base_dir = "/sys/bus/w1/devices/"
-    device_folders = glob.glob(base_dir + "28-*")
-
-    readings = {}
-
-    for folder in device_folders:
-        sensor_id = folder.split("/")[-1]
-        device_file = folder + "/w1_slave"
-        label = sensor_map.get(sensor_id)
-
-        if label:
-            try:
-                temp = DS18B20(device_file).read_temperature()
-                readings[label] = round(temp, 1)
-            except Exception as e:
-                readings[label] = f"error: {e}"
-    return readings
+    return get_readings()
 
 
 @app.get("/latest-image")
