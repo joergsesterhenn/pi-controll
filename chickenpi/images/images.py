@@ -7,7 +7,7 @@ import subprocess
 def get_latest_image(directory="captures"):
     image_files = glob.glob(f"{directory}/20??/??/??/*_capture.jpg", recursive=True)
     if not image_files:
-        return {"error": "No captures found"}
+        return ""
     image_files.sort(key=os.path.getmtime)
     latest_image = image_files[-1]
     return latest_image

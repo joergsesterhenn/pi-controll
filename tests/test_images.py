@@ -1,18 +1,25 @@
 from unittest.mock import MagicMock, patch
-from chickenpi.images import get_latest_image, get_new_image
+from chickenpi.images.images import get_latest_image, get_new_image
 
 
-def test_get_latest_image(tmp_path):
-    assert get_latest_image(tmp_path) == {"error": "No captures found"}
+def test_get_latest_image_none_found(tmp_path):
+    assert get_latest_image(tmp_path) == ""
 
 
-@patch("chickenpi.images.os.makedirs")
-@patch("chickenpi.images.subprocess.run")
-@patch("chickenpi.images.datetime")
+def test_get_latest_image():
+    assert (
+        get_latest_image("tests/data/")
+        == "tests/data/2020/01/01/2025-08-26-00-05-00_capture.jpg"
+    )
+
+
+@patch("chickenpi.images.images.os.makedirs")
+@patch("chickenpi.images.images.subprocess.run")
+@patch("chickenpi.images.images.datetime")
 def test_get_new_image(
-    mock_datetime,
-    mock_run,
-    mock_makedirs,
+    mock_datetime: MagicMock,
+    mock_run: MagicMock,
+    mock_makedirs: MagicMock,
     tmp_path,
 ):
     fake_now = MagicMock()

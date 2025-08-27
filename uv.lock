@@ -150,8 +150,10 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "rich" },
     { name = "toml-cli" },
 ]
 
@@ -167,8 +169,10 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "rich", specifier = ">=14.1.0" },
     { name = "toml-cli", specifier = ">=0.8.1" },
 ]
 

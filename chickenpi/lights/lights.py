@@ -1,6 +1,6 @@
 import logging
 
-from chickenpi.lights_driver import LightsDriver
+from chickenpi.lights.lights_driver import LightsDriver
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import logging
 
-from chickenpi.door_driver import DoorDriver, DoorState
+from chickenpi.door.door_driver import DoorDriver, DoorState
 
 logger = logging.getLogger(__name__)
 

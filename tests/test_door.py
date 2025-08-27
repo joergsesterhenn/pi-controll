@@ -1,7 +1,6 @@
-from chickenpi.door import DoorState, close_door, coop_door_state, open_door
-from gpiozero.pins.mock import MockPin, MockFactory
+from chickenpi.door.door import DoorState, close_door, coop_door_state, open_door
 
-from chickenpi.door_driver import DoorDriver
+from chickenpi.door.door_driver import DoorDriver
 
 
 def test_open_door_open():
