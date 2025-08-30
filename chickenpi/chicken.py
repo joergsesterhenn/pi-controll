@@ -1,18 +1,20 @@
 import logging
-import sys
-
-from fastapi import Depends, FastAPI
+import chickenpi.logging.logging  # noqa: F401
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from chickenpi.auth.auth import FirebaseUser, init_auth, verify_firebase_token
+from chickenpi.auth.auth import FirebaseUser, init_auth, lifespan, verify_firebase_token
 from chickenpi.door.door import close_door, coop_door_state, open_door
 from chickenpi.images.images import get_latest_image, get_new_image
 from chickenpi.lights.lights import state, toggle
 from chickenpi.temperature.temperature import get_readings
 
-app = FastAPI()
+logger = logging.getLogger(__name__)
+
+app = FastAPI(lifespan=lifespan)
+
 origins = [
     "https://coop-pi.web.app",
     "http://localhost:8000",
@@ -27,14 +29,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-init_auth()
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    stream=sys.stdout,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+@app.exception_handler(HTTPException)
+async def log_http_exception(request: Request, exc: HTTPException):
+    logger.warning("HTTP %s on %s: %s", exc.status_code, request.url.path, exc.detail)
+    raw = request.headers.get("Authorization")
+
+    # Mask or trim it if you worry about logging secrets
+    display = raw if not raw else f"{raw[:100]}…"
+
+    logger.error(
+        "Auth error (%s %s): %s – Authorization header: %s",
+        request.method,
+        request.url.path,
+        exc.detail,
+        display,
+    )
+
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
+# 5. Optional: request/response logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info("→ %s %s", request.method, request.url.path)
+    response = await call_next(request)
+    logger.info("← %s %s %s", request.method, request.url.path, response.status_code)
+    return response
+
 
 app.mount("/captures", StaticFiles(directory="."), name="captures")
 
@@ -49,8 +71,9 @@ def coop_door(direction: str, user_info: FirebaseUser = Depends(verify_firebase_
 
 
 @app.get("/door-state")
-def door_state(user_info: FirebaseUser = Depends(verify_firebase_token)):
-    logger.info("door state requested by %s", user_info.name)
+def door_state():
+    # logger.info("door state requested by %s", user_info.name)
+    logger.info("door-state")
     return coop_door_state()
 
 

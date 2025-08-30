@@ -7,7 +7,7 @@ from lgpio import gpiochip_open, gpio_read, gpiochip_close, error
 from threading import Lock
 from enum import Enum
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("app")
 
 
 class LightState(Enum):
