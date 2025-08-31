@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
     try:
         init_auth()
         logger.info("Firebase Admin initialized successfully.")
-    except Exception as e:
+    except Exception:
         logger.exception("Failed to initialize Firebase Admin:")
         raise
 

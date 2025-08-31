@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from chickenpi.auth.auth import FirebaseUser, init_auth, lifespan, verify_firebase_token
+from chickenpi.auth.auth import FirebaseUser, lifespan, verify_firebase_token
 from chickenpi.door.door import close_door, coop_door_state, open_door
 from chickenpi.images.images import get_latest_image, get_new_image
 from chickenpi.lights.lights import state, toggle
@@ -71,7 +71,7 @@ def coop_door(direction: str, user_info: FirebaseUser = Depends(verify_firebase_
 
 
 @app.get("/door-state")
-def door_state():
+def door_state(user_info: FirebaseUser = Depends(verify_firebase_token)):
     # logger.info("door state requested by %s", user_info.name)
     logger.info("door-state")
     return coop_door_state()

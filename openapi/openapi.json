@@ -40,7 +40,8 @@
             "description": "Successful Response",
             "content": { "application/json": { "schema": {} } }
           }
-        }
+        },
+        "security": [{ "HTTPBearer": [] }]
       }
     },
     "/lights": {
