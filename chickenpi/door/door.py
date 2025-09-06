@@ -1,42 +1,41 @@
 import logging
-
 from chickenpi.door.door_driver import DoorDriver, DoorState
 
 logger = logging.getLogger(__name__)
 
-driver = DoorDriver()
+door_driver: DoorDriver = DoorDriver()
 
 
-def open_door(driver: DoorDriver = driver):
+def open_door(driver: DoorDriver = door_driver) -> DoorState:
     if driver.state in (DoorState.OPENING, DoorState.CLOSING):
         logger.info("door is moving")
-        return {"status": driver.state.name}
+        return driver.state
 
     if driver.state == DoorState.OPEN:
         logger.info("door is already open")
-        return {"status": driver.state.name}
+        return driver.state
     logger.info("opening door")
     driver.up()
-    return {"status": driver.state.name}
+    return driver.state
 
 
-def close_door(driver: DoorDriver = driver):
+def close_door(driver: DoorDriver = door_driver) -> DoorState:
     if driver.state in (DoorState.OPENING, DoorState.CLOSING):
         logger.info("door is moving")
-        return {"status": driver.state.name}
+        return driver.state
 
     if driver.state == DoorState.CLOSED:
         logger.info("door is already closed")
-        return {"status": driver.state.name}
+        return driver.state
     logger.info("closing door")
     driver.down()
-    return {"status": driver.state.name}
+    return driver.state
 
 
-def coop_door_state(driver: DoorDriver = driver):
+def coop_door_state(driver: DoorDriver = door_driver) -> DoorState:
     if driver.upper_stop_sensor.value:
-        return {"status": DoorState.OPEN.value}
+        return DoorState.OPEN
     if driver.lower_stop_sensor.value:
-        return {"status": DoorState.CLOSED.value}
+        return DoorState.CLOSED
     else:
-        return {"status": driver.state.value}
+        return driver.state

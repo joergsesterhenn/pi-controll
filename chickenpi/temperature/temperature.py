@@ -1,9 +1,15 @@
 import glob
 import time
 
+from pydantic import BaseModel
+
+
+class Temperature(BaseModel):
+    inside: float
+    outside: float
+
 
 def get_readings(base_dir="/sys/bus/w1/devices/"):
-    # Map known sensor IDs to logical names
     sensor_map = {"28-0417a142c0ff": "inside", "28-0417a12507ff": "outside"}
     device_folders = glob.glob(base_dir + "28-*")
 
@@ -13,14 +19,10 @@ def get_readings(base_dir="/sys/bus/w1/devices/"):
         sensor_id = folder.split("/")[-1]
         device_file = folder + "/w1_slave"
         label = sensor_map.get(sensor_id)
-
         if label:
-            try:
-                temp = DS18B20(device_file).read_temperature()
-                readings[label] = round(temp, 1)
-            except Exception as e:
-                readings[label] = f"error: {e}"
-    return readings
+            temp = DS18B20(device_file).read_temperature()
+            readings[label] = round(temp, 1)
+    return Temperature(inside=readings["inside"], outside=readings["outside"])
 
 
 class DS18B20:

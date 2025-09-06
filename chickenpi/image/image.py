@@ -3,6 +3,8 @@ import glob
 import os
 import subprocess
 
+from pydantic import BaseModel
+
 
 def get_latest_image(directory="captures"):
     image_files = glob.glob(f"{directory}/20??/??/??/*_capture.jpg", recursive=True)
@@ -20,3 +22,8 @@ def get_new_image(directory="captures"):
     filename = f"{foldername}/{timestamp}_capture.jpg"
     subprocess.run(["fswebcam", "-r", "1280x960", filename])
     return filename
+
+
+class ImageStatus(BaseModel):
+    status: str
+    filename: str
