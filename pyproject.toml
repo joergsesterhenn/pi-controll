@@ -1,18 +1,33 @@
 [project]
 name = "chickenpi"
-version = "0.2.0"
+version = "1.0.0"
 description = "Backend for automating chicken coop with raspberry pi."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.116.1",
+    "fastapi[standard]>=0.116.1",
+    "firebase-admin>=7.1.0",
     "gpiozero>=2.0.1",
     "rich>=14.0.0",
-    "rpi-gpio>=0.7.1",
-    "uvicorn>=0.35.0",
+    "rpi-lgpio>=0.6",
+    "sentry-sdk[fastapi]>=2.35.1",
+    "uvicorn[standard]>=0.35.0",
 ]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "rich>=14.1.0",
     "toml-cli>=0.8.1",
 ]
+
+[tool.pytest.ini_options]
+addopts = "--capture sys"
+testpaths = [
+    "tests",
+]
+
+[tool.setuptools]
+py-modules = []
