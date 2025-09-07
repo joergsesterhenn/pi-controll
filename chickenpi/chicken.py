@@ -15,6 +15,16 @@ from chickenpi.light.light import toggle, state
 from chickenpi.light.light_driver import Light
 from chickenpi.temperature.temperature import Temperature, get_readings
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://b93f102ceabbff8abc772ffa927e989a@o4509977674711040.ingest.de.sentry.io/4509977744048208",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(lifespan=lifespan)
@@ -106,7 +116,7 @@ def capture_image(
     return ImageStatus(status="image captured", filename=filename)
 
 
-@app.get("/image")
+@app.get("/image", response_class=FileResponse)
 def latest_image(
     user_info: FirebaseUser = Depends(verify_firebase_token),
 ) -> FileResponse:

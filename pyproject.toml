@@ -10,6 +10,7 @@ dependencies = [
     "gpiozero>=2.0.1",
     "rich>=14.0.0",
     "rpi-lgpio>=0.6",
+    "sentry-sdk[fastapi]>=2.35.1",
     "uvicorn[standard]>=0.35.0",
 ]
 
