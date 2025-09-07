@@ -29,5 +29,6 @@ testpaths = [
     "tests",
 ]
 
-[tool.setuptools]
-py-modules = []
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["chickenpi*"]
