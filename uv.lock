@@ -143,7 +143,6 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "firebase-admin" },
     { name = "gpiozero" },
-    { name = "rich" },
     { name = "rpi-lgpio" },
     { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "uvicorn", extra = ["standard"] },
@@ -154,7 +153,6 @@ dev = [
     { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-cov" },
-    { name = "rich" },
     { name = "toml-cli" },
 ]
 
@@ -163,7 +161,6 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
     { name = "firebase-admin", specifier = ">=7.1.0" },
     { name = "gpiozero", specifier = ">=2.0.1" },
-    { name = "rich", specifier = ">=14.0.0" },
     { name = "rpi-lgpio", specifier = ">=0.6" },
     { name = "sentry-sdk", extras = ["fastapi"], specifier = ">=2.35.1" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.35.0" },
@@ -174,7 +171,6 @@ dev = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "rich", specifier = ">=14.1.0" },
     { name = "toml-cli", specifier = ">=0.8.1" },
 ]
 

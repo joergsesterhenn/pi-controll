@@ -33,9 +33,17 @@ def close_door(driver: DoorDriver = door_driver) -> DoorState:
 
 
 def coop_door_state(driver: DoorDriver = door_driver) -> DoorState:
-    if driver.upper_stop_sensor.value:
-        return DoorState.OPEN
-    if driver.lower_stop_sensor.value:
-        return DoorState.CLOSED
-    else:
-        return driver.state
+    if driver.state == DoorState.UNDEFINED:
+        logger.debug("door.state is UNDEFINED")
+        if driver.upper_stop_sensor.value:
+            logger.debug("upper stop sensor is True -> returning OPEN")
+            return DoorState.OPEN
+        if driver.lower_stop_sensor.value:
+            logger.debug("lower stop sensor is True -> returning CLOSED")
+            return DoorState.CLOSED
+
+    logger.debug(
+        "door.state defined, or lower and upper stop sensor are FALSE returning %s",
+        driver.state.name,
+    )
+    return driver.state

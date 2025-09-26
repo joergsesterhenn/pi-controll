@@ -8,6 +8,7 @@ import pytest
 from chickenpi.auth.auth import FirebaseUser, verify_firebase_token
 from chickenpi.door.door_driver import Door, DoorState
 from chickenpi.light.light_driver import Light, LightState
+from chickenpi.temperature.temperature import Temperature
 
 
 @pytest.fixture(scope="function")
@@ -20,6 +21,18 @@ def client():
 
     app.dependency_overrides[verify_firebase_token] = override_verify
     return TestClient(app)
+
+
+@patch("chickenpi.chicken.coop_door_state")
+def test_door_state(mock_door: MagicMock, client):
+    door_return_value = DoorState.OPENING
+    mock_door.return_value = door_return_value
+    response: JSONResponse = client.get("/door/state")
+    assert response.status_code == 200
+    assert (
+        str(response.content, encoding="UTF-8")
+        == Door(status=DoorState.OPENING).model_dump_json()
+    )
 
 
 @patch("chickenpi.chicken.open_door")
@@ -90,4 +103,15 @@ def test_light_state(mock_light: MagicMock, client):
     assert (
         str(response.content, encoding="UTF-8")
         == Light(status=LightState.OFF).model_dump_json()
+    )
+
+
+@patch("chickenpi.chicken.get_readings")
+def test_read_temperature(mock_temperature: MagicMock, client):
+    mock_temperature.return_value = Temperature(inside=10, outside=10)
+    response: Response = client.get("/temperature")
+    assert response.status_code == 200
+    assert (
+        str(response.content, encoding="UTF-8")
+        == Temperature(inside=10, outside=10).model_dump_json()
     )
