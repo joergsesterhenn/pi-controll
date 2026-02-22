@@ -4,9 +4,12 @@ import time
 from pydantic import BaseModel
 
 
+from typing import Optional
+
+
 class Temperature(BaseModel):
-    inside: float
-    outside: float
+    inside: Optional[float]
+    outside: Optional[float]
 
 
 def get_readings(base_dir="/sys/bus/w1/devices/"):
