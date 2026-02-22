@@ -88,3 +88,8 @@ celerybeat-schedule
 
 # Linux
 *.lock
+
+# Extension system
+.specify/extensions/.cache/
+.specify/extensions/.backup/
+.specify/extensions/*/local-config.yml
