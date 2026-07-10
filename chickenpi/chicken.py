@@ -1,4 +1,5 @@
 import logging
+import base64
 import chickenpi.logging.logging  # noqa: F401
 
 
@@ -22,6 +23,11 @@ sentry_sdk.init(
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Enable logs to be sent to Sentry
+    enable_logs=True,
 )
 
 
@@ -116,15 +122,31 @@ def capture_image(
     return ImageStatus(status="image captured", filename=filename)
 
 
-@app.get("/image", response_class=FileResponse)
+@app.get("/image")
 def latest_image(
     user_info: FirebaseUser = Depends(verify_firebase_token),
-) -> FileResponse:
+) -> dict:
     logger.info("latest image requested by %s", user_info.name)
-    latest_image = get_latest_image()
-    if not latest_image:
+
+    latest_image_path = get_latest_image()
+    if not latest_image_path:
         raise HTTPException(status_code=404, detail="No image available")
-    return FileResponse(latest_image, media_type="image/jpeg")
+
+    try:
+        with open(latest_image_path, "rb") as image_file:
+            binary_data = image_file.read()
+
+        base64_encoded = base64.b64encode(binary_data).decode("utf-8")
+
+        return {
+            "status": "success",
+            "image": base64_encoded,
+            "media_type": "image/jpeg",
+        }
+
+    except Exception as e:
+        logger.error("Failed to encode image: %s", str(e))
+        raise HTTPException(status_code=500, detail="Error processing image file")
 
 
 @app.get("/temperature")
