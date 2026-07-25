@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+
 from chickenpi.image.image import get_latest_image, get_new_image
 
 
@@ -37,5 +38,7 @@ def test_get_new_image(
     expected_folder = f"{base_dir}/2025/08/26"
     expected_filename = f"{expected_folder}/2025-08-26-00-05-00_capture.jpg"
     mock_makedirs.assert_called_once_with(expected_folder, exist_ok=True)
-    mock_run.assert_called_once_with(["fswebcam", "-r", "1280x960", expected_filename])
+    mock_run.assert_called_once_with(
+        ["fswebcam", "-r", "1280x960", expected_filename], check=False
+    )
     assert result == expected_filename

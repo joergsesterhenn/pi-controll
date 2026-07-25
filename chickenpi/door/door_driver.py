@@ -1,7 +1,7 @@
-from gpiozero import Motor, DigitalInputDevice
-from threading import Lock
 from enum import Enum
+from threading import Lock
 
+from gpiozero import DigitalInputDevice, Motor
 from pydantic import BaseModel
 
 from chickenpi.device.factory import get_device_factory

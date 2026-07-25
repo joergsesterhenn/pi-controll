@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock
+
 from chickenpi.light.light import state, toggle
 from chickenpi.light.light_driver import LightDriver, LightState
 

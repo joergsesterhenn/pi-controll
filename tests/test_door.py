@@ -1,4 +1,4 @@
-from chickenpi.door.door import coop_door_state, close_door, open_door
+from chickenpi.door.door import close_door, coop_door_state, open_door
 from chickenpi.door.door_driver import DoorDriver, DoorState
 
 

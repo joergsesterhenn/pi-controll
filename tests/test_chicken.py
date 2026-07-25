@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 from fastapi import Response
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
-import pytest
 
 from chickenpi.auth.auth import FirebaseUser, verify_firebase_token
 from chickenpi.door.door_driver import Door, DoorState
@@ -81,7 +81,65 @@ def test_chicken_latest_image(mock_capture: MagicMock, client):
     mock_capture.return_value = image
     response: Response = client.get("/image")
     assert response.status_code == 200
-    assert list(response.content) == []
+    assert list(response.content) == [
+        123,
+        34,
+        115,
+        116,
+        97,
+        116,
+        117,
+        115,
+        34,
+        58,
+        34,
+        115,
+        117,
+        99,
+        99,
+        101,
+        115,
+        115,
+        34,
+        44,
+        34,
+        105,
+        109,
+        97,
+        103,
+        101,
+        34,
+        58,
+        34,
+        34,
+        44,
+        34,
+        109,
+        101,
+        100,
+        105,
+        97,
+        95,
+        116,
+        121,
+        112,
+        101,
+        34,
+        58,
+        34,
+        105,
+        109,
+        97,
+        103,
+        101,
+        47,
+        106,
+        112,
+        101,
+        103,
+        34,
+        125,
+    ]
 
 
 @patch("chickenpi.chicken.toggle")

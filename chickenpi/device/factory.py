@@ -1,6 +1,6 @@
+from gpiozero.exc import PinUnknownPi
 from gpiozero.pins.lgpio import LGPIOFactory
 from gpiozero.pins.mock import MockFactory, MockPWMPin
-from gpiozero.exc import PinUnknownPi
 
 
 def get_device_factory(type=""):
