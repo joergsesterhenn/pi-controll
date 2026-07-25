@@ -1,23 +1,22 @@
-import base64
-import importlib.metadata
 import logging
-from typing import Annotated
+import base64
+import chickenpi.logging.logging  # noqa: F401
 
-import sentry_sdk
+
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from chickenpi.auth.auth import FirebaseUser, lifespan, verify_firebase_token
-from chickenpi.door.door import close_door, coop_door_state, open_door
+from chickenpi.door.door import close_door, open_door, coop_door_state
 from chickenpi.door.door_driver import Door
 from chickenpi.image.image import ImageStatus, get_latest_image, get_new_image
-from chickenpi.light.light import state, toggle
+from chickenpi.light.light import toggle, state
 from chickenpi.light.light_driver import Light
 from chickenpi.temperature.temperature import Temperature, get_readings
 
-chickenpi_version = importlib.metadata.version("chickenpi")
+import sentry_sdk
 
 sentry_sdk.init(
     dsn="https://b93f102ceabbff8abc772ffa927e989a@o4509977674711040.ingest.de.sentry.io/4509977744048208",
@@ -29,8 +28,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     # Enable logs to be sent to Sentry
     enable_logs=True,
-    environment="production",
-    release=chickenpi_version,
 )
 
 
@@ -63,7 +60,7 @@ async def log_http_exception(request: Request, exc: HTTPException):
     display = raw if not raw else f"{raw[:100]}…"
 
     logger.error(
-        "HTTP error (%s %s): %s - Authorization header: %s",
+        "HTTP error (%s %s): %s – Authorization header: %s",
         request.method,
         request.url.path,
         exc.detail,
@@ -86,7 +83,7 @@ app.mount("/captures", StaticFiles(directory="."), name="captures")
 
 @app.post("/door")
 def coop_door(
-    direction: str, user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)]
+    direction: str, user_info: FirebaseUser = Depends(verify_firebase_token)
 ) -> Door:
     logger.info("door sent %s by %s", direction, user_info.name)
     if direction == "up":
@@ -97,30 +94,26 @@ def coop_door(
 
 
 @app.get("/door/state")
-def door_state(
-    user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)],
-) -> Door:
+def door_state(user_info: FirebaseUser = Depends(verify_firebase_token)) -> Door:
     logger.info("door-state requested by %s", user_info.name)
     return Door(status=coop_door_state())
 
 
 @app.post("/light")
-def lights(user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)]) -> Light:
+def lights(user_info: FirebaseUser = Depends(verify_firebase_token)) -> Light:
     logger.info("lights toggled by %s", user_info.name)
     return Light(status=toggle())
 
 
 @app.get("/light/state")
-def light_state(
-    user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)],
-) -> Light:
+def light_state(user_info: FirebaseUser = Depends(verify_firebase_token)) -> Light:
     logger.info("light state requested by %s", user_info.name)
     return Light(status=state())
 
 
 @app.post("/image")
 def capture_image(
-    user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)],
+    user_info: FirebaseUser = Depends(verify_firebase_token),
 ) -> ImageStatus:
     logger.info("new image requested by %s", user_info.name)
     filename = get_new_image()
@@ -131,7 +124,7 @@ def capture_image(
 
 @app.get("/image")
 def latest_image(
-    user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)],
+    user_info: FirebaseUser = Depends(verify_firebase_token),
 ) -> dict:
     logger.info("latest image requested by %s", user_info.name)
 
@@ -151,20 +144,17 @@ def latest_image(
             "media_type": "image/jpeg",
         }
 
-    except (
-        TypeError,
-        AttributeError,
-    ) as e:
+    except Exception as e:
         logger.error("Failed to encode image: %s", str(e))
         raise HTTPException(status_code=500, detail="Error processing image file")
 
 
 @app.get("/temperature")
 def read_temperature(
-    user_info: Annotated[FirebaseUser, Depends(verify_firebase_token)],
+    user_info: FirebaseUser = Depends(verify_firebase_token),
 ) -> Temperature:
     logger.info("temperature requested by %s", user_info.name)
     try:
         return get_readings()
-    except ValueError:
+    except Exception:
         raise HTTPException(status_code=500, detail="Could not read Temperature")
