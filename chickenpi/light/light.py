@@ -1,5 +1,4 @@
 import logging
-
 from chickenpi.light.light_driver import LightDriver, LightState
 
 logger = logging.getLogger(__name__)

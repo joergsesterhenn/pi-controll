@@ -1,8 +1,9 @@
 import logging
-from enum import IntEnum
-from threading import Lock
-
 from gpiozero import OutputDevice
+from lgpio import gpiochip_open, gpio_read, gpiochip_close
+from threading import Lock
+from enum import IntEnum
+
 from pydantic import BaseModel
 
 from chickenpi.device.factory import get_device_factory
@@ -40,13 +41,23 @@ class LightDriver:
 
     def get_relay(self) -> OutputDevice:
         if self.relay_1 is None:
+            initial_value = False if self.get_current_state(self.relay_1_pin) else True
+            logger.info(f"Initializing relay1 with value={initial_value}")
             self.relay_1 = OutputDevice(
                 self.relay_1_pin,
                 active_high=False,
-                initial_value=None,
+                initial_value=initial_value,
                 pin_factory=get_device_factory(),
             )
-            logger.info(
-                f"Initializing relay1 (active_high=False, is_active={self.relay_1.is_active()})"
-            )
         return self.relay_1
+
+    @staticmethod
+    def get_current_state(pin):
+        try:
+            chip0 = gpiochip_open(0)
+            current = gpio_read(chip0, pin)
+            gpiochip_close(chip0)
+            return current
+        except Exception:
+            logger.exception("Failed to read initial value.")
+            return True

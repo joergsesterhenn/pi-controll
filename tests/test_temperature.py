@@ -1,5 +1,4 @@
 import pytest
-
 from chickenpi.temperature.temperature import Temperature, get_readings
 
 
