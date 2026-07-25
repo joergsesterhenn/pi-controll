@@ -1,13 +1,14 @@
-from fastapi import Depends, HTTPException, status, FastAPI
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from contextlib import asynccontextmanager
 import logging
 import os
-from typing import Optional
+from contextlib import asynccontextmanager
+from typing import Annotated
 
 import firebase_admin
+import sentry_sdk
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth, credentials
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -27,27 +28,37 @@ def init_auth():
         cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
         firebase_admin.initialize_app(cred)
     except ValueError as e:
-        logger.exception(e)
+        logger.exception()
         raise ValueError(f"Error initializing Firebase Admin SDK: {e}")
 
 
 class FirebaseUser(BaseModel):
     uid: str
-    name: Optional[str]
+    name: str | None
 
 
 bearer_scheme = HTTPBearer()
 
 
 async def verify_firebase_token(
-    creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    creds: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
 ) -> FirebaseUser:
     id_token = creds.credentials
 
     try:
         decoded = auth.verify_id_token(id_token)
-        return FirebaseUser(**decoded)
-    except Exception as e:
+        user = FirebaseUser(**decoded)
+        sentry_sdk.set_user({"id": user.uid, "name": user.name})
+        return user
+    except (
+        ValidationError,
+        ValueError,
+        auth.InvalidIdTokenError,
+        auth.ExpiredIdTokenError,
+        auth.RevokedIdTokenError,
+        auth.CertificateFetchError,
+        auth.UserDisabledError,
+    ) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token verification failed: {e}",
