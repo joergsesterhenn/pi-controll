@@ -32,6 +32,12 @@ def close_door(driver: DoorDriver = door_driver) -> DoorState:
     return driver.state
 
 
+def reset_door_state(driver: DoorDriver = door_driver) -> DoorState:
+    logger.info("resetting door state")
+    driver.reset()
+    return driver.state
+
+
 def coop_door_state(driver: DoorDriver = door_driver) -> DoorState:
     if driver.state == DoorState.UNDEFINED:
         logger.debug("door.state is UNDEFINED")

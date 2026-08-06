@@ -1,14 +1,22 @@
 from gpiozero import Motor, DigitalInputDevice
 from threading import Lock
-from enum import Enum
+from enum import IntEnum
+import logging
 
 from pydantic import BaseModel
 
 from chickenpi.device.factory import get_device_factory
 
+logger = logging.getLogger(__name__)
 
-class DoorState(Enum):
-    UNDEFINED, OPEN, CLOSED, OPENING, CLOSING = range(5)
+
+class DoorState(IntEnum):
+    UNDEFINED = 0
+    OPEN = 1
+    CLOSED = 2
+    OPENING = 3
+    CLOSING = 4
+    ERROR = 5
 
 
 class Door(BaseModel):
@@ -51,16 +59,30 @@ class DoorDriver:
         with self.lock:
             self.state = DoorState.OPEN
 
+    def reset(self):
+        with self.lock:
+            self.state = DoorState.UNDEFINED
+
     def up(self):
         with self.lock:
             self.state = DoorState.OPENING
             self.motor.forward()
-            self.upper_stop_sensor.wait_for_active(self.door_wait_time)
+            if not self.upper_stop_sensor.wait_for_active(self.door_wait_time):
+                logger.error(
+                    "Door failed to reach upper stop sensor within %s seconds. Setting state to ERROR.",
+                    self.door_wait_time,
+                )
+                self.state = DoorState.ERROR
             self.motor.stop()
 
     def down(self):
         with self.lock:
             self.state = DoorState.CLOSING
             self.motor.backward()
-            self.upper_stop_sensor.wait_for_active(self.door_wait_time)
+            if not self.lower_stop_sensor.wait_for_active(self.door_wait_time):
+                logger.error(
+                    "Door failed to reach lower stop sensor within %s seconds. Setting state to ERROR.",
+                    self.door_wait_time,
+                )
+                self.state = DoorState.ERROR
             self.motor.stop()

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 from chickenpi.auth.auth import FirebaseUser, verify_firebase_token
-from chickenpi.door.door_driver import Door, DoorState
+from chickenpi.door.door_driver import DoorState
 from chickenpi.light.light_driver import Light, LightState
 from chickenpi.temperature.temperature import Temperature
 
@@ -29,10 +29,7 @@ def test_door_state(mock_door: MagicMock, client):
     mock_door.return_value = door_return_value
     response: JSONResponse = client.get("/door/state")
     assert response.status_code == 200
-    assert (
-        str(response.content, encoding="UTF-8")
-        == Door(status=DoorState.OPENING).model_dump_json()
-    )
+    assert response.json() == {"status": DoorState.OPENING}
 
 
 @patch("chickenpi.chicken.open_door")
@@ -41,10 +38,7 @@ def test_chicken_door_up(mock_door: MagicMock, client):
     mock_door.return_value = door_return_value
     response: JSONResponse = client.post("/door?direction=up")
     assert response.status_code == 200
-    assert (
-        str(response.content, encoding="UTF-8")
-        == Door(status=DoorState.OPENING).model_dump_json()
-    )
+    assert response.json() == {"status": DoorState.OPENING}
 
 
 @patch("chickenpi.chicken.close_door")
@@ -53,10 +47,7 @@ def test_chicken_door_down(mock_door: MagicMock, client):
     mock_door.return_value = door_return_value
     response: Response = client.post("/door?direction=down")
     assert response.status_code == 200
-    assert (
-        str(response.content, encoding="UTF-8")
-        == Door(status=DoorState.CLOSING).model_dump_json()
-    )
+    assert response.json() == {"status": DoorState.CLOSING}
 
 
 @patch("chickenpi.chicken.get_new_image")
@@ -115,3 +106,44 @@ def test_read_temperature(mock_temperature: MagicMock, client):
         str(response.content, encoding="UTF-8")
         == Temperature(inside=10, outside=10).model_dump_json()
     )
+
+
+@patch("chickenpi.chicken.coop_door_state")
+@patch("chickenpi.chicken.reset_door_state")
+@patch("chickenpi.chicken.open_door")
+def test_door_error_and_reset(
+    mock_open_door: MagicMock,
+    mock_reset_door: MagicMock,
+    mock_coop_door_state: MagicMock,
+    client,
+):
+    # Simulate error state
+    mock_coop_door_state.return_value = DoorState.ERROR
+    mock_reset_door.return_value = DoorState.UNDEFINED  # Reset returns undefined
+
+    # Try to open door when in error state - should fail
+    response = client.post("/door?direction=up")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Door in error state, reset required"}
+    mock_open_door.assert_not_called()
+
+    # Reset the door
+    response = client.post("/door/reset")
+    assert response.status_code == 200
+    assert response.json() == {"status": DoorState.UNDEFINED}
+    mock_reset_door.assert_called_once()
+
+    # After reset, open door should now work
+    mock_coop_door_state.return_value = DoorState.CLOSED  # Simulate reset worked
+    mock_open_door.return_value = DoorState.OPENING
+    response = client.post("/door?direction=up")
+    assert response.status_code == 200
+    assert response.json() == {"status": DoorState.OPENING}
+    mock_open_door.assert_called_once()
+
+
+@patch("chickenpi.chicken.get_readings", side_effect=Exception("Sensor Read Error"))
+def test_read_temperature_sensor_unresponsive(mock_temperature: MagicMock, client):
+    response: Response = client.get("/temperature")
+    assert response.status_code == 200
+    assert response.json() == {"inside": None, "outside": None}

@@ -9,8 +9,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from chickenpi.auth.auth import FirebaseUser, lifespan, verify_firebase_token
-from chickenpi.door.door import close_door, open_door, coop_door_state
-from chickenpi.door.door_driver import Door
+from chickenpi.door.door import close_door, open_door, coop_door_state, reset_door_state
+from chickenpi.door.door_driver import Door, DoorState
 from chickenpi.image.image import ImageStatus, get_latest_image, get_new_image
 from chickenpi.light.light import toggle, state
 from chickenpi.light.light_driver import Light
@@ -86,6 +86,8 @@ def coop_door(
     direction: str, user_info: FirebaseUser = Depends(verify_firebase_token)
 ) -> Door:
     logger.info("door sent %s by %s", direction, user_info.name)
+    if coop_door_state() == DoorState.ERROR:
+        raise HTTPException(status_code=400, detail="Door in error state, reset required")
     if direction == "up":
         return Door(status=open_door())
     if direction == "down":
@@ -97,6 +99,12 @@ def coop_door(
 def door_state(user_info: FirebaseUser = Depends(verify_firebase_token)) -> Door:
     logger.info("door-state requested by %s", user_info.name)
     return Door(status=coop_door_state())
+
+
+@app.post("/door/reset")
+def reset_door(user_info: FirebaseUser = Depends(verify_firebase_token)) -> Door:
+    logger.info("door-reset requested by %s", user_info.name)
+    return Door(status=reset_door_state())
 
 
 @app.post("/light")
@@ -156,5 +164,6 @@ def read_temperature(
     logger.info("temperature requested by %s", user_info.name)
     try:
         return get_readings()
-    except Exception:
-        raise HTTPException(status_code=500, detail="Could not read Temperature")
+    except Exception as e:
+        logger.error("Failed to read temperature: %s", e)
+        return Temperature(inside=None, outside=None)
