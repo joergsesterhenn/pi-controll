@@ -1,6 +1,5 @@
 from fastapi import Depends, HTTPException, status, FastAPI
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from contextlib import asynccontextmanager
+from fastapi.security import APIKeyQuery, HTTPBearer, HTTPAuthorizationCredentials
 import logging
 import os
 from typing import Optional
@@ -54,17 +53,23 @@ async def verify_firebase_token(
         )
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # --- Startup ---
+# NEU: Sagt FastAPI, dass das Token im URL-Parameter (?token=...) gesucht werden soll
+token_query_scheme = APIKeyQuery(name="token", auto_error=False)
+
+# NEU: Validierungs-Dependency für den Live-Stream
+async def verify_firebase_token_from_query(
+    id_token: Optional[str] = Depends(token_query_scheme),
+) -> FirebaseUser:
+    if not id_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token missing from URL query parameters",
+        )
     try:
-        init_auth()
-        logger.info("Firebase Admin initialized successfully.")
-    except Exception:
-        logger.exception("Failed to initialize Firebase Admin:")
-        raise
-
-    yield  # === app is now running ===
-
-    # --- Shutdown (optional) ---
-    logger.info("Shutting down application.")
+        decoded = auth.verify_id_token(id_token)
+        return FirebaseUser(**decoded)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token verification failed: {e}",
+        )
