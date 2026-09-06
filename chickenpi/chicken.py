@@ -5,17 +5,23 @@ import chickenpi.logging.logging  # noqa: F401
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse 
 from fastapi.staticfiles import StaticFiles
 
-from chickenpi.auth.auth import FirebaseUser, lifespan, verify_firebase_token
+from chickenpi.auth.auth import (
+    init_auth,
+    FirebaseUser,
+    verify_firebase_token,
+    verify_firebase_token_from_query,
+)
 from chickenpi.door.door import close_door, open_door, coop_door_state
 from chickenpi.door.door_driver import Door
 from chickenpi.image.image import ImageStatus, get_latest_image, get_new_image
 from chickenpi.light.light import toggle, state
 from chickenpi.light.light_driver import Light
 from chickenpi.temperature.temperature import Temperature, get_readings
-
+from chickenpi.stream.stream import start_camera, stop_camera, gen_frames
+from contextlib import asynccontextmanager
 import sentry_sdk
 
 sentry_sdk.init(
@@ -30,8 +36,24 @@ sentry_sdk.init(
     enable_logs=True,
 )
 
-
 logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- Startup ---
+    try:
+        init_auth()
+        logger.info("Firebase Admin initialized successfully.")
+        start_camera()
+    except Exception:
+        logger.exception("Failed to initialize Firebase Admin:")
+        raise
+
+    yield  # === app is now running ===
+
+    # --- Shutdown (optional) ---
+    logger.info("Shutting down application.")
+    stop_camera()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -43,6 +65,7 @@ origins = [
     "http://localhost:5173",
     "http://raspberrypi:8000",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -158,3 +181,15 @@ def read_temperature(
         return get_readings()
     except Exception:
         raise HTTPException(status_code=500, detail="Could not read Temperature")
+
+@app.get("/stream")
+def video_stream(
+    user_info: FirebaseUser = Depends(verify_firebase_token_from_query),
+):
+    """Gibt den kontinuierlichen Live-Stream (MJPEG) zurück."""
+    logger.info("Live stream requested by %s (UID: %s)", user_info.name or "Unknown", user_info.uid)
+    
+    return StreamingResponse(
+        gen_frames(), 
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )

@@ -1,3 +1,5 @@
+import base64
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from fastapi import Response
@@ -81,7 +83,15 @@ def test_chicken_latest_image(mock_capture: MagicMock, client):
     mock_capture.return_value = image
     response: Response = client.get("/image")
     assert response.status_code == 200
-    assert list(response.content) == []
+
+    with open(image, "rb") as image_file:
+        expected_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+    assert response.json() == {
+        "status": "success",
+        "image": expected_image,
+        "media_type": "image/jpeg",
+    }
 
 
 @patch("chickenpi.chicken.toggle")
