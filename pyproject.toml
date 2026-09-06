@@ -13,7 +13,6 @@ dependencies = [
     "firebase-admin>=7.5.0",
     "gpiozero>=2.0.1",
     "opencv-python-headless>=5.0.0.93",
-    "pydantic-core>=2.48.0",
     "python-json-logger>=4.2.0",
     "rpi-lgpio>=0.6",
     "sentry-sdk[fastapi]>=2.68.1",
