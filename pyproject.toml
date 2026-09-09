@@ -7,7 +7,7 @@ name = "chickenpi"
 version = "1.0.0"
 description = "Backend for automating chicken coop with raspberry pi."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.141.1",
     "firebase-admin>=7.5.0",
