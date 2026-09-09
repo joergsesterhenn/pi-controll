@@ -58,8 +58,8 @@ required-environments = [
 [[tool.uv.index]]
 name = "piwheels"
 url = "https://www.piwheels.org/simple"
+default = true
 
 [[tool.uv.index]]
 name = "pypi"
 url = "https://pypi.org/simple"
-default = true
