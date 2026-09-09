@@ -51,36 +51,25 @@ jobs:
           name: chickenpi-${{ env.UNIQUE_VERSION }}
           path: dist/chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: "release-${{ env.UNIQUE_VERSION }}"
-          release_name: "Release ${{ env.UNIQUE_VERSION }}"
+          name: "Release ${{ env.UNIQUE_VERSION }}"
           draft: false
           prerelease: false
-
-      - name: Upload Release Artifact
-        uses: actions/upload-release-asset@v1
+          files: dist/chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
-          asset_name: chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
-          asset_content_type: application/zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy via SSH
+      - name: Trigger Deployment on Pi
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_KEY }}
-          script: |
-            echo "get latest release"
+          script: echo "Triggering deployment command..."
