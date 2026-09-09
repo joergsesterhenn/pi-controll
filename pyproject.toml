@@ -7,16 +7,16 @@ name = "chickenpi"
 version = "1.0.0"
 description = "Backend for automating chicken coop with raspberry pi."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
-    "fastapi[standard]>=0.141.1",
-    "firebase-admin>=7.5.0",
-    "gpiozero>=2.0.1",
+    "fastapi[standard]==0.141.1",
+    "firebase-admin==7.5.0",
+    "gpiozero==2.0.1",
     "opencv-python-headless==5.0.0.93",
-    "python-json-logger>=4.2.0",
-    "rpi-lgpio>=0.6",
-    "sentry-sdk[fastapi]>=2.68.1",
-    "uvicorn[standard]>=0.52.4",
+    "python-json-logger==4.2.0",
+    "rpi-lgpio==0.6",
+    "sentry-sdk[fastapi]==2.68.1",
+    "uvicorn[standard]==0.52.4",
     "numpy==2.4.6",
     "httptools==0.8.0",
     "pyyaml==6.0.3",
