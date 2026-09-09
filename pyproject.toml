@@ -12,12 +12,12 @@ dependencies = [
     "fastapi[standard]==0.141.1",
     "firebase-admin==7.5.0",
     "gpiozero==2.0.1",
-    "opencv-python-headless==5.0.0.93",
+    "opencv-python-headless==4.10.0.84",
     "python-json-logger==4.2.0",
     "rpi-lgpio==0.6",
     "sentry-sdk[fastapi]==2.68.1",
     "uvicorn[standard]==0.52.4",
-    "numpy==2.4.6",
+    "numpy==1.26.4",
     "httptools==0.8.0",
     "pyyaml==6.0.3",
     "uvloop==0.21.0",
@@ -44,8 +44,8 @@ where = ["."]
 include = ["chickenpi*"]
 
 [tool.uv.sources]
-opencv-python-headless = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl" }
-numpy = { url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl" }
+opencv-python-headless = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-4.10.0.84-cp311-cp311-linux_armv7l.whl" }
+numpy = { url = "https://piwheels.org/simple/numpy/numpy-1.26.4-cp311-cp311-linux_armv7l.whl" }
 httptools= { url = "https://piwheels.org/simple/httptools/httptools-0.8.0-cp311-cp311-linux_armv7l.whl" }
 pyyaml = { url = "https://piwheels.org/simple/pyyaml/pyyaml-6.0.3-cp311-cp311-linux_armv7l.whl" }
 uvloop = { url = "https://piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl" }

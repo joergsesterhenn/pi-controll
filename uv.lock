@@ -1,6 +1,11 @@
 version = 1
 revision = 3
 requires-python = "==3.11.*"
+resolution-markers = [
+    "sys_platform == 'darwin'",
+    "platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')",
+]
 required-markers = [
     "platform_machine == 'armv7l' and sys_platform == 'linux'",
 ]
@@ -164,8 +169,8 @@ requires-dist = [
     { name = "firebase-admin", specifier = "==7.5.0" },
     { name = "gpiozero", specifier = "==2.0.1" },
     { name = "httptools", url = "https://piwheels.org/simple/httptools/httptools-0.8.0-cp311-cp311-linux_armv7l.whl" },
-    { name = "numpy", url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl" },
-    { name = "opencv-python-headless", url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl" },
+    { name = "numpy", url = "https://piwheels.org/simple/numpy/numpy-1.26.4-cp311-cp311-linux_armv7l.whl" },
+    { name = "opencv-python-headless", url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-4.10.0.84-cp311-cp311-linux_armv7l.whl" },
     { name = "python-json-logger", specifier = "==4.2.0" },
     { name = "pyyaml", url = "https://piwheels.org/simple/pyyaml/pyyaml-6.0.3-cp311-cp311-linux_armv7l.whl" },
     { name = "rpi-lgpio", specifier = "==0.6" },
@@ -790,27 +795,35 @@ wheels = [
 
 [[package]]
 name = "numpy"
-version = "2.4.6"
-source = { url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl" }
+version = "1.26.4"
+source = { url = "https://piwheels.org/simple/numpy/numpy-1.26.4-cp311-cp311-linux_armv7l.whl" }
 wheels = [
-    { url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl", hash = "sha256:a74f04fb7f02e62d9d2f3c9758a5dab22ebefda6f87d6c703b9f968b06485fbb" },
+    { url = "https://piwheels.org/simple/numpy/numpy-1.26.4-cp311-cp311-linux_armv7l.whl", hash = "sha256:81a37a6d46f316f63b79f58865068410ff7a9e6bc37555c7600f1f608d7872fc" },
 ]
 
 [[package]]
 name = "opencv-python-headless"
-version = "5.0.0.93"
-source = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl" }
+version = "4.10.0.84"
+source = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-4.10.0.84-cp311-cp311-linux_armv7l.whl" }
 dependencies = [
     { name = "numpy" },
 ]
 wheels = [
-    { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl", hash = "sha256:df42511b74078430680f5bbf526282c9eaa08f4a8e0f65b0902614f1313a0744" },
+    { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-4.10.0.84-cp311-cp311-linux_armv7l.whl", hash = "sha256:a7205d4bc162e54f4824514251e467ca3009c6478009704d3ed18b23ce2284d3" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "numpy", marker = "python_full_version < '3.9'", specifier = "<2.0" },
-    { name = "numpy", marker = "python_full_version >= '3.9'", specifier = ">=2" },
+    { name = "numpy", marker = "python_full_version < '3.7'", specifier = ">=1.13.3" },
+    { name = "numpy", marker = "python_full_version >= '3.7'", specifier = ">=1.17.0" },
+    { name = "numpy", marker = "python_full_version >= '3.8'", specifier = ">=1.17.3" },
+    { name = "numpy", marker = "python_full_version >= '3.9'", specifier = ">=1.19.3" },
+    { name = "numpy", marker = "python_full_version >= '3.10'", specifier = ">=1.21.2" },
+    { name = "numpy", marker = "python_full_version >= '3.11'", specifier = ">=1.23.5" },
+    { name = "numpy", marker = "python_full_version >= '3.12'", specifier = ">=1.26.0" },
+    { name = "numpy", marker = "python_full_version >= '3.10' and sys_platform == 'darwin'", specifier = ">=1.21.4" },
+    { name = "numpy", marker = "python_full_version < '3.10' and platform_machine == 'arm64' and sys_platform == 'darwin'", specifier = ">=1.21.0" },
+    { name = "numpy", marker = "python_full_version >= '3.6' and platform_machine == 'aarch64' and sys_platform == 'linux'", specifier = ">=1.19.3" },
 ]
 
 [[package]]
