@@ -52,3 +52,12 @@ pyyaml= { url = "https://piwheels.org/simple/pyyaml/pyyaml-6.0.3-cp311-cp311-lin
 required-environments = [
     "sys_platform == 'linux' and platform_machine == 'armv7l'"
 ]
+
+[[tool.uv.index]]
+name = "piwheels"
+url = "https://www.piwheels.org/simple"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
