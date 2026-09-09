@@ -97,6 +97,7 @@ dependencies = [
     { name = "rpi-lgpio" },
     { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "uvicorn", extra = ["standard"] },
+    { name = "uvloop" },
 ]
 
 [package.dev-dependencies]
@@ -119,6 +120,7 @@ requires-dist = [
     { name = "rpi-lgpio", specifier = "==0.6" },
     { name = "sentry-sdk", extras = ["fastapi"], specifier = "==2.68.1" },
     { name = "uvicorn", extras = ["standard"], specifier = "==0.52.4" },
+    { name = "uvloop", url = "https://piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl" },
 ]
 
 [package.metadata.requires-dev]
@@ -1009,11 +1011,26 @@ standard = [
 [[package]]
 name = "uvloop"
 version = "0.21.0"
-source = { registry = "https://www.piwheels.org/simple" }
+source = { url = "https://piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl" }
 wheels = [
-    { url = "https://www.piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv6l.whl", hash = "sha256:dfc014f8655370f16648f01850a47e7c7508e47dd00912c4f8a2bc58a5d183e2" },
-    { url = "https://www.piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl", hash = "sha256:dfc014f8655370f16648f01850a47e7c7508e47dd00912c4f8a2bc58a5d183e2" },
+    { url = "https://piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl", hash = "sha256:dfc014f8655370f16648f01850a47e7c7508e47dd00912c4f8a2bc58a5d183e2" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiohttp", marker = "extra == 'test'", specifier = ">=3.10.5" },
+    { name = "cython", marker = "extra == 'dev'", specifier = "~=3.0" },
+    { name = "flake8", marker = "extra == 'test'", specifier = "~=5.0" },
+    { name = "mypy", marker = "extra == 'test'", specifier = ">=0.800" },
+    { name = "psutil", marker = "extra == 'test'" },
+    { name = "pycodestyle", marker = "extra == 'test'", specifier = "~=2.9.0" },
+    { name = "pyopenssl", marker = "extra == 'test'", specifier = "~=23.0.0" },
+    { name = "setuptools", marker = "extra == 'dev'", specifier = ">=60" },
+    { name = "sphinx", marker = "extra == 'docs'", specifier = "~=4.1.2" },
+    { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = "~=0.5.2" },
+    { name = "sphinxcontrib-asyncio", marker = "extra == 'docs'", specifier = "~=0.3.0" },
+]
+provides-extras = ["dev", "docs", "test"]
 
 [[package]]
 name = "watchfiles"

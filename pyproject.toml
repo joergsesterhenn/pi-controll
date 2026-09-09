@@ -20,6 +20,7 @@ dependencies = [
     "numpy==2.4.6",
     "httptools==0.8.0",
     "pyyaml==6.0.3",
+    "uvloop==0.21.0",
 ]
 
 [global]
@@ -46,7 +47,8 @@ include = ["chickenpi*"]
 opencv-python-headless = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl" }
 numpy = { url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl" }
 httptools= { url = "https://piwheels.org/simple/httptools/httptools-0.8.0-cp311-cp311-linux_armv7l.whl" }
-pyyaml= { url = "https://piwheels.org/simple/pyyaml/pyyaml-6.0.3-cp311-cp311-linux_armv7l.whl" }
+pyyaml = { url = "https://piwheels.org/simple/pyyaml/pyyaml-6.0.3-cp311-cp311-linux_armv7l.whl" }
+uvloop = { url = "https://piwheels.org/simple/uvloop/uvloop-0.21.0-cp311-cp311-linux_armv7l.whl" }
 
 [tool.uv]
 required-environments = [
