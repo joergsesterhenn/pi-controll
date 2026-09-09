@@ -17,6 +17,7 @@ dependencies = [
     "rpi-lgpio>=0.6",
     "sentry-sdk[fastapi]>=2.68.1",
     "uvicorn[standard]>=0.52.4",
+    "numpy>=2.4.6",
 ]
 
 [dependency-groups]
@@ -35,3 +36,12 @@ testpaths = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["chickenpi*"]
+
+[tool.uv.sources]
+opencv-python-headless = { url = "https://piwheels.org/simple/opencv-python-headless/opencv_python_headless-5.0.0.93-cp311-cp311-linux_armv7l.whl" }
+numpy = { url = "https://piwheels.org/simple/numpy/numpy-2.4.6-cp311-cp311-linux_armv7l.whl" }
+
+[tool.uv]
+required-environments = [
+    "sys_platform == 'linux' and platform_machine == 'armv7l'"
+]
