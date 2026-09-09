@@ -16,10 +16,10 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -46,7 +46,7 @@ jobs:
           uv build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: chickenpi-${{ env.UNIQUE_VERSION }}
           path: dist/chickenpi-${{ env.UNIQUE_VERSION }}-py3-none-any.whl
